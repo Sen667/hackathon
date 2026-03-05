@@ -77,6 +77,11 @@ export default function Welcome() {
 
     const navItems = ['Aide', 'À propos', 'Voitures', 'Réservation'];
 
+    const getNavLink = (item: string) => {
+        if (item === 'Voitures') return '/catalogue';
+        return '#';
+    };
+
     // ---- Section "Notre sélection" (pills + cards) ----
     const [vehicleFilter, setVehicleFilter] = useState('Premium');
     const vehicleFilters = ['Premium', 'SUV', 'Berline', 'Coupe', 'Autres'];
@@ -140,7 +145,7 @@ export default function Welcome() {
                     {navItems.map((item) => (
                         <a
                             key={item}
-                            href="#"
+                            href={getNavLink(item)}
                             className="text-sm tracking-wide text-[#555] transition-colors hover:text-[#091E79]"
                         >
                             {item}
@@ -165,7 +170,7 @@ export default function Welcome() {
                     {navItems.map((item) => (
                         <a
                             key={item}
-                            href="#"
+                            href={getNavLink(item)}
                             className="border-b border-black/5 px-6 py-4 text-sm text-[#333] transition-colors hover:bg-[#091E79]/5 hover:text-[#091E79] lg:px-16"
                             onClick={() => setMenuOpen(false)}
                         >

@@ -4,11 +4,12 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\SubscriptionPlanController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\VehicleController as AdminVehicleController;
 use App\Http\Controllers\Admin\VehicleTypeController as AdminVehicleTypeController;
+use App\Http\Controllers\Api\DashboardController as ApiDashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -60,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
 
     // Types de véhicules
     Route::apiResource('vehicle-types', AdminVehicleTypeController::class);
@@ -80,4 +81,28 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
     // Utilisateurs
     Route::apiResource('users', AdminUserController::class)->only(['index', 'show', 'update', 'destroy']);
+});
+
+// Dashboard API v1 endpoints
+Route::prefix('v1')->group(function () {
+    Route::get('dashboard/all', [ApiDashboardController::class, 'getAllData']);
+    Route::get('dashboard/stats', [ApiDashboardController::class, 'getStats']);
+    Route::get('dashboard/availability-by-type', [ApiDashboardController::class, 'getAvailabilityByType']);
+    Route::get('dashboard/upcoming-bookings', [ApiDashboardController::class, 'getUpcomingBookings']);
+    Route::get('dashboard/ongoing-bookings', [ApiDashboardController::class, 'getOngoingBookings']);
+});
+
+// Admin Vehicle API routes
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    Route::get('vehicles', [AdminVehicleController::class, 'index']);
+    Route::post('vehicles', [AdminVehicleController::class, 'store']);
+    Route::get('vehicles/{vehicle}', [AdminVehicleController::class, 'show']);
+    Route::put('vehicles/{vehicle}', [AdminVehicleController::class, 'update']);
+    Route::delete('vehicles/{vehicle}', [AdminVehicleController::class, 'destroy']);
+});
+
+// Public Reservations API
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('reservations', [App\Http\Controllers\ReservationController::class, 'store']);
+    Route::get('reservations', [App\Http\Controllers\ReservationController::class, 'index']);
 });

@@ -1,114 +1,180 @@
-import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/auth-layout';
-import { login } from '@/routes';
-import { store } from '@/routes/register';
+import { Head, Link, useForm } from '@inertiajs/react';
+import React, { FormEventHandler } from 'react';
 
 export default function Register() {
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+    });
+
+    const submit: FormEventHandler = (e) => {
+        e.preventDefault();
+        post('/register', {
+            onFinish: () => reset('password', 'password_confirmation'),
+        });
+    };
+
     return (
-        <AuthLayout
-            title="Create an account"
-            description="Enter your details below to create your account"
-        >
-            <Head title="Register" />
-            <Form
-                {...store.form()}
-                resetOnSuccess={['password', 'password_confirmation']}
-                disableWhileProcessing
-                className="flex flex-col gap-6"
-            >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
+        <>
+            <Head title="Inscription" />
+            <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center px-6 py-12">
+                <div className="w-full max-w-md">
+                    {/* Logo */}
+                    <div className="text-center mb-8">
+                        <Link href="/" className="inline-block">
+                            <h1 className="font-serif text-3xl font-bold tracking-tight text-[#1a1a1a]">
+                                Lyla<span className="text-[#091E79]">Mobility</span>
+                            </h1>
+                        </Link>
+                        <p className="mt-2 text-sm text-[#666]">Créez votre compte</p>
+                    </div>
+
+                    {/* Register Form */}
+                    <div className="bg-white rounded-2xl border border-black/10 shadow-lg p-8">
+                        <form onSubmit={submit} className="space-y-6">
+                            {/* Name */}
+                            <div>
+                                <label
+                                    htmlFor="name"
+                                    className="block text-sm font-medium text-[#1a1a1a] mb-2"
+                                >
+                                    Nom complet
+                                </label>
+                                <input
                                     id="name"
                                     type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="name"
                                     name="name"
-                                    placeholder="Full name"
+                                    value={data.name}
+                                    className="w-full rounded-xl border border-black/10 bg-[#FAFAF8] px-4 py-3 text-sm text-[#1a1a1a] placeholder-[#999] transition outline-none focus:border-[#091E79] focus:ring-2 focus:ring-[#091E79]/10"
+                                    autoComplete="name"
+                                    placeholder="Jean Dupont"
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    required
                                 />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
+                                {errors.name && (
+                                    <p className="mt-2 text-sm text-red-600">
+                                        {errors.name}
+                                    </p>
+                                )}
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
+                            {/* Email */}
+                            <div>
+                                <label
+                                    htmlFor="email"
+                                    className="block text-sm font-medium text-[#1a1a1a] mb-2"
+                                >
+                                    Email
+                                </label>
+                                <input
                                     id="email"
                                     type="email"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="email"
                                     name="email"
-                                    placeholder="email@example.com"
+                                    value={data.email}
+                                    className="w-full rounded-xl border border-black/10 bg-[#FAFAF8] px-4 py-3 text-sm text-[#1a1a1a] placeholder-[#999] transition outline-none focus:border-[#091E79] focus:ring-2 focus:ring-[#091E79]/10"
+                                    autoComplete="username"
+                                    placeholder="votre@email.com"
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    required
                                 />
-                                <InputError message={errors.email} />
+                                {errors.email && (
+                                    <p className="mt-2 text-sm text-red-600">
+                                        {errors.email}
+                                    </p>
+                                )}
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
+                            {/* Password */}
+                            <div>
+                                <label
+                                    htmlFor="password"
+                                    className="block text-sm font-medium text-[#1a1a1a] mb-2"
+                                >
+                                    Mot de passe
+                                </label>
+                                <input
                                     id="password"
                                     type="password"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="new-password"
                                     name="password"
-                                    placeholder="Password"
+                                    value={data.password}
+                                    className="w-full rounded-xl border border-black/10 bg-[#FAFAF8] px-4 py-3 text-sm text-[#1a1a1a] placeholder-[#999] transition outline-none focus:border-[#091E79] focus:ring-2 focus:ring-[#091E79]/10"
+                                    autoComplete="new-password"
+                                    placeholder="••••••••"
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    required
                                 />
-                                <InputError message={errors.password} />
+                                {errors.password && (
+                                    <p className="mt-2 text-sm text-red-600">
+                                        {errors.password}
+                                    </p>
+                                )}
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-                                <Input
+                            {/* Password Confirmation */}
+                            <div>
+                                <label
+                                    htmlFor="password_confirmation"
+                                    className="block text-sm font-medium text-[#1a1a1a] mb-2"
+                                >
+                                    Confirmer le mot de passe
+                                </label>
+                                <input
                                     id="password_confirmation"
                                     type="password"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="Confirm password"
+                                    value={data.password_confirmation}
+                                    className="w-full rounded-xl border border-black/10 bg-[#FAFAF8] px-4 py-3 text-sm text-[#1a1a1a] placeholder-[#999] transition outline-none focus:border-[#091E79] focus:ring-2 focus:ring-[#091E79]/10"
+                                    autoComplete="new-password"
+                                    placeholder="••••••••"
+                                    onChange={(e) =>
+                                        setData('password_confirmation', e.target.value)
+                                    }
+                                    required
                                 />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
+                                {errors.password_confirmation && (
+                                    <p className="mt-2 text-sm text-red-600">
+                                        {errors.password_confirmation}
+                                    </p>
+                                )}
                             </div>
 
-                            <Button
+                            {/* Submit Button */}
+                            <button
                                 type="submit"
-                                className="mt-2 w-full"
-                                tabIndex={5}
-                                data-test="register-user-button"
+                                disabled={processing}
+                                className="w-full rounded-xl bg-[#091E79] py-3.5 text-sm font-medium text-white transition hover:bg-[#071660] disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {processing && <Spinner />}
-                                Create account
-                            </Button>
-                        </div>
+                                {processing ? 'Création...' : 'Créer mon compte'}
+                            </button>
+                        </form>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                Log in
-                            </TextLink>
+                        {/* Login Link */}
+                        <div className="mt-6 text-center">
+                            <p className="text-sm text-[#666]">
+                                Déjà un compte?{' '}
+                                <Link
+                                    href="/login"
+                                    className="font-medium text-[#091E79] hover:opacity-70 transition"
+                                >
+                                    Se connecter
+                                </Link>
+                            </p>
                         </div>
-                    </>
-                )}
-            </Form>
-        </AuthLayout>
+                    </div>
+
+                    {/* Back to Home */}
+                    <div className="mt-6 text-center">
+                        <Link
+                            href="/"
+                            className="text-sm text-[#666] hover:text-[#091E79] transition"
+                        >
+                            ← Retour à l'accueil
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 }
