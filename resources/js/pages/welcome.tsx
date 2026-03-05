@@ -1,6 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Footer from '@/components/Footer';
 import VehicleCard from '@/components/VehicleCard';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const CarIcon = () => (
     <svg
@@ -69,6 +73,19 @@ export default function Welcome() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('voitures');
 
+    // Refs pour les animations
+    const heroTitleRef = useRef<HTMLHeadingElement>(null);
+    const heroTextRef = useRef<HTMLParagraphElement>(null);
+    const heroBoxRef = useRef<HTMLDivElement>(null);
+    const heroImageRef = useRef<HTMLImageElement>(null);
+    const selectionSectionRef = useRef<HTMLDivElement>(null);
+    const selectionTitleRef = useRef<HTMLDivElement>(null);
+    const vehicleCardsRef = useRef<HTMLDivElement>(null);
+    const subscriptionSectionRef = useRef<HTMLElement>(null);
+    const subscriptionTitleRef = useRef<HTMLDivElement>(null);
+    const pricingCardsRef = useRef<HTMLDivElement>(null);
+    const contactSectionRef = useRef<HTMLElement>(null);
+
     const tabs = [
         { id: 'voitures', label: 'Voitures', icon: CarIcon },
         { id: 'utilitaires', label: 'Utilitaires', icon: TruckIcon },
@@ -77,8 +94,142 @@ export default function Welcome() {
 
     const navItems = ['Aide', 'À propos', 'Voitures', 'Réservation'];
 
+    // Animations GSAP
+    useEffect(() => {
+        // Petit délai pour s'assurer que le DOM est prêt
+        const timer = setTimeout(() => {
+            // Animation hero section
+            const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+            
+            if (heroTitleRef.current) {
+                tl.fromTo(heroTitleRef.current, 
+                    { opacity: 0, y: 50 },
+                    { opacity: 1, y: 0, duration: 1 }
+                );
+            }
+
+            if (heroTextRef.current) {
+                tl.fromTo(heroTextRef.current,
+                    { opacity: 0, y: 30 },
+                    { opacity: 1, y: 0, duration: 0.8 },
+                    '-=0.6'
+                );
+            }
+
+            if (heroBoxRef.current) {
+                tl.fromTo(heroBoxRef.current,
+                    { opacity: 0, y: 40 },
+                    { opacity: 1, y: 0, duration: 0.8 },
+                    '-=0.5'
+                );
+            }
+
+            if (heroImageRef.current) {
+                tl.fromTo(heroImageRef.current,
+                    { opacity: 0, x: 100 },
+                    { opacity: 1, x: 0, duration: 1.2 },
+                    '-=0.8'
+                );
+            }
+
+            // Animation section "Notre sélection"
+            if (selectionTitleRef.current && selectionTitleRef.current.children.length > 0) {
+                gsap.fromTo(selectionTitleRef.current.children,
+                    { opacity: 0, y: 50 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scrollTrigger: {
+                            trigger: selectionTitleRef.current,
+                            start: 'top 80%',
+                        },
+                        stagger: 0.2,
+                        duration: 1,
+                        ease: 'power3.out',
+                    }
+                );
+            }
+
+            if (vehicleCardsRef.current && vehicleCardsRef.current.children.length > 0) {
+                gsap.fromTo(vehicleCardsRef.current.children,
+                    { opacity: 0, y: 60 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scrollTrigger: {
+                            trigger: vehicleCardsRef.current,
+                            start: 'top 85%',
+                        },
+                        stagger: 0.15,
+                        duration: 0.8,
+                        ease: 'power2.out',
+                    }
+                );
+            }
+
+            // Animation section "Abonnement"
+            if (subscriptionTitleRef.current && subscriptionTitleRef.current.children.length > 0) {
+                gsap.fromTo(subscriptionTitleRef.current.children,
+                    { opacity: 0, y: 50 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scrollTrigger: {
+                            trigger: subscriptionTitleRef.current,
+                            start: 'top 80%',
+                        },
+                        stagger: 0.2,
+                        duration: 1,
+                        ease: 'power3.out',
+                    }
+                );
+            }
+
+            if (pricingCardsRef.current && pricingCardsRef.current.children.length > 0) {
+                gsap.fromTo(pricingCardsRef.current.children,
+                    { opacity: 0, y: 60, scale: 0.95 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        scrollTrigger: {
+                            trigger: pricingCardsRef.current,
+                            start: 'top 85%',
+                        },
+                        stagger: 0.2,
+                        duration: 0.8,
+                        ease: 'back.out(1.2)',
+                    }
+                );
+            }
+
+            // Animation section contact
+            if (contactSectionRef.current && contactSectionRef.current.children[0]) {
+                gsap.fromTo(contactSectionRef.current.children[0],
+                    { opacity: 0, scale: 0.95 },
+                    {
+                        opacity: 1,
+                        scale: 1,
+                        scrollTrigger: {
+                            trigger: contactSectionRef.current,
+                            start: 'top 80%',
+                        },
+                        duration: 1,
+                        ease: 'power3.out',
+                    }
+                );
+            }
+        }, 100);
+
+        return () => {
+            clearTimeout(timer);
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        };
+    }, []);
+
     const getNavLink = (item: string) => {
         if (item === 'Voitures') return '/catalogue';
+        if (item === 'Réservation') return '/my-bookings';
         return '#';
     };
 
@@ -152,7 +303,7 @@ export default function Welcome() {
                         </a>
                     ))}
                     <a
-                        href="#"
+                        href="/login"
                         className="rounded-full bg-[#1a1a1a] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#091E79]"
                     >
                         Connexion
@@ -193,20 +344,20 @@ export default function Welcome() {
             <section className="grid min-h-[calc(100vh-70px)] flex-1 grid-cols-1 items-center overflow-hidden lg:grid-cols-2">
                 {/* LEFT — avec padding */}
                 <div className="z-10 flex flex-col gap-6 px-6 py-12 lg:px-16 lg:py-0">
-                    <h1 className="font-serif text-5xl leading-[1.08] font-bold tracking-tight text-[#1a1a1a] lg:text-6xl">
+                    <h1 ref={heroTitleRef} className="font-serif text-5xl leading-[1.08] font-bold tracking-tight text-[#1a1a1a] lg:text-6xl">
                         Louez des voitures
                         <br />
                         carrément{' '}
                         <span className="text-[#091E79] italic">belles.</span>
                     </h1>
 
-                    <p className="max-w-md text-base leading-relaxed font-light text-[#666]">
+                    <p ref={heroTextRef} className="max-w-md text-base leading-relaxed font-light text-[#666]">
                         Des modèles d'exception disponibles en quelques clics.
                         Livraison à domicile, kilométrage illimité.
                     </p>
 
                     {/* BOOKING BOX */}
-                    <div className="flex max-w-2xl flex-col gap-5 rounded-2xl border border-[#E9E9E9] bg-[#F9F9F9] p-6 shadow-[0_4px_40px_rgba(0,0,0,0.06)]">
+                    <div ref={heroBoxRef} className="flex max-w-2xl flex-col gap-5 rounded-2xl border border-[#E9E9E9] bg-[#F9F9F9] p-6 shadow-[0_4px_40px_rgba(0,0,0,0.06)]">
                         {/* Tabs */}
                         <div className="flex flex-wrap items-center gap-2">
                             {tabs.map((t) => {
@@ -269,9 +420,12 @@ export default function Welcome() {
                         </div>
 
                         {/* Submit */}
-                        <button className="w-full rounded-xl bg-[#091E79] py-3.5 text-sm font-medium text-white transition-colors hover:bg-[#071660]">
+                        <a
+                            href="/catalogue"
+                            className="w-full rounded-xl bg-[#091E79] py-3.5 text-sm font-medium text-white transition-colors hover:bg-[#071660]"
+                        >
                             Voir les véhicules
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -284,6 +438,7 @@ export default function Welcome() {
 
                     {/* Image collée à droite */}
                     <img
+                        ref={heroImageRef}
                         src="/mercedes.png"
                         alt="Mercedes"
                         className="absolute top-1/2 right-0 h-auto w-full max-w-[720px] -translate-y-1/2 object-contain drop-shadow-2xl"
@@ -291,9 +446,9 @@ export default function Welcome() {
                 </div>
             </section>
 
-            <section className="bg-[#FAFAF8] px-6 py-20 lg:px-16">
+            <section ref={selectionSectionRef} className="bg-[#FAFAF8] px-6 py-20 lg:px-16">
                 {/* Headings */}
-                <div className="mx-auto max-w-5xl text-center">
+                <div ref={selectionTitleRef} className="mx-auto max-w-5xl text-center">
                     <p className="text-sm tracking-wide text-[#091E79]/70">
                         Nos Véhicules de location
                     </p>
@@ -326,7 +481,7 @@ export default function Welcome() {
                     </div>
                 </div>
 
-                <div className="mx-auto mt-16 grid max-w-6xl grid-cols-1 gap-14 md:grid-cols-2 lg:grid-cols-3">
+                <div ref={vehicleCardsRef} className="mx-auto mt-16 grid max-w-6xl grid-cols-1 gap-14 md:grid-cols-2 lg:grid-cols-3">
                     {cards.map((c, idx) => (
                         <VehicleCard key={`${c.title}-${idx}`} {...c} />
                     ))}
@@ -335,7 +490,7 @@ export default function Welcome() {
                 {/* Bottom link */}
                 <div className="mt-16 text-center">
                     <a
-                        href="#"
+                        href="/catalogue"
                         className="inline-flex items-center gap-2 text-lg font-medium text-[#091E79] transition hover:opacity-70"
                     >
                         Voir Plus <span aria-hidden>→</span>
@@ -343,11 +498,11 @@ export default function Welcome() {
                 </div>
             </section>
 
-            <section className="bg-[#FAFAF8] px-6 py-20 lg:px-16">
+            <section ref={subscriptionSectionRef} className="bg-[#FAFAF8] px-6 py-20 lg:px-16">
                 {/* Headings */}
-                <div className="mx-auto max-w-5xl text-center">
+                <div ref={subscriptionTitleRef} className="mx-auto max-w-5xl text-center">
                     <h2 className="font-serif text-5xl font-bold tracking-tight text-[#0f0f0f] lg:text-6xl">
-                        Notre Service d’Abonnement
+                        Notre Service d'Abonnement
                     </h2>
 
                     <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed font-light text-[#666]">
@@ -434,7 +589,7 @@ export default function Welcome() {
                     );
 
                     return (
-                        <div className="mx-auto mt-16 grid max-w-6xl grid-cols-1 items-end gap-10 lg:grid-cols-3 lg:gap-12">
+                        <div ref={pricingCardsRef} className="mx-auto mt-16 grid max-w-6xl grid-cols-1 items-end gap-10 lg:grid-cols-3 lg:gap-12">
                             {plans.map((p, idx) => (
                                 <div
                                     key={`${p.name}-${idx}`}
@@ -502,7 +657,7 @@ export default function Welcome() {
             </section>
 
             {/* ── SECTION : Contactez-Nous ── */}
-            <section className="bg-[#FAFAF8] px-6 py-20 lg:px-16">
+            <section ref={contactSectionRef} className="bg-[#FAFAF8] px-6 py-20 lg:px-16">
                 <div className="mx-auto max-w-7xl rounded-[32px] bg-[#3B4A93] px-10 py-20 text-center text-white">
                     <h2 className="font-serif text-5xl font-bold tracking-tight lg:text-6xl">
                         Contactez-Nous

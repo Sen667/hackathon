@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Head } from '@inertiajs/react';
 import VehicleCard from '@/components/VehicleCard';
 import ReservationModal from '@/components/ReservationModal';
 import Footer from '@/components/Footer';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const LilyIcon = () => (
     <svg
@@ -46,6 +50,11 @@ export default function Catalogue({ vehicles }: Props) {
     const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
     const [showModal, setShowModal] = useState(false);
 
+    // Refs pour les animations
+    const sidebarRef = useRef<HTMLDivElement>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
+    const vehicleGridRef = useRef<HTMLDivElement>(null);
+
     const navItems = ['Aide', 'À propos', 'Voitures', 'Réservation'];
     const vehicleFilters = ['Tous', 'Premium', 'SUV', 'Berline', 'Coupe', 'Électrique'];
 
@@ -64,6 +73,59 @@ export default function Catalogue({ vehicles }: Props) {
         
         return matchesSearch && matchesType && matchesBrand && isAvailable;
     });
+
+    // Animations GSAP
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            // Animation sidebar
+            if (sidebarRef.current && sidebarRef.current.children.length > 0) {
+                gsap.fromTo(sidebarRef.current.children,
+                    { opacity: 0, x: -30 },
+                    { 
+                        opacity: 1, 
+                        x: 0, 
+                        duration: 0.6,
+                        stagger: 0.1,
+                        ease: 'power2.out'
+                    }
+                );
+            }
+
+            // Animation header
+            if (headerRef.current) {
+                gsap.fromTo(headerRef.current,
+                    { opacity: 0, y: 20 },
+                    { 
+                        opacity: 1, 
+                        y: 0, 
+                        duration: 0.6,
+                        ease: 'power2.out'
+                    }
+                );
+            }
+
+            // Animation vehicle cards
+            if (vehicleGridRef.current && vehicleGridRef.current.children.length > 0) {
+                gsap.fromTo(vehicleGridRef.current.children,
+                    { opacity: 0, y: 40, scale: 0.95 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.5,
+                        stagger: 0.08,
+                        delay: 0.2,
+                        ease: 'power2.out',
+                    }
+                );
+            }
+        }, 100);
+
+        return () => {
+            clearTimeout(timer);
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+        };
+    }, [filteredVehicles]);
 
     return (
         <div className="flex min-h-screen flex-col bg-[#FAFAF8]">
@@ -141,7 +203,7 @@ export default function Catalogue({ vehicles }: Props) {
                 <div className="mx-auto max-w-7xl">
                     <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
                         {/* Left Sidebar - Filters */}
-                        <aside className="space-y-6">
+                        <aside ref={sidebarRef} className="space-y-6">
                             {/* Search */}
                             <div className="bg-white rounded-2xl border border-black/5 p-6">
                                 <div className="flex items-center justify-between mb-4">
@@ -263,7 +325,7 @@ export default function Catalogue({ vehicles }: Props) {
                         {/* Right Content */}
                         <div>
                             {/* Header */}
-                            <div className="mb-6">
+                            <div ref={headerRef} className="mb-6">
                                 <div className="flex items-center justify-between">
                                     <h1 className="text-3xl font-serif font-bold text-[#1a1a1a]">Catalogue</h1>
                                     <div className="flex gap-3">
@@ -289,7 +351,7 @@ export default function Catalogue({ vehicles }: Props) {
                                     <p className="text-lg text-[#666]">Aucun véhicule trouvé</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                <div ref={vehicleGridRef} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                     {filteredVehicles.map((vehicle) => (
                                         <VehicleCard
                                             key={vehicle.id}
