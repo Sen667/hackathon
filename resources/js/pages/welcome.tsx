@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Footer from '@/components/Footer';
-import VehicleCard from '@/components/VehicleCard.tsx';
+import VehicleCard from '@/components/VehicleCard';
 
 const CarIcon = () => (
     <svg
@@ -65,7 +65,7 @@ const LilyIcon = () => (
     </svg>
 );
 
-export default function Welcome({ canRegister = true }) {
+export default function Welcome() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('voitures');
 
